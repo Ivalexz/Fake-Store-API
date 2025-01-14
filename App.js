@@ -1,20 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+
+import MainScreen from "./MainScreen";
+import CartScreen from "./CartScreen";
+import { ShopProvider } from "./context/ShopContext";
+import { BurgerProvider } from "./context/BurgerContext";
 
 export default function App() {
+  const [mainScreen, setMainScreen] = useState(true);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <ShopProvider>
+      <BurgerProvider onBurgerPress={() => setMainScreen(!mainScreen)}>
+      {mainScreen ? <MainScreen /> : <CartScreen />}
+      </BurgerProvider>
       <StatusBar style="auto" />
-    </View>
+    </ShopProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
