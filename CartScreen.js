@@ -1,19 +1,32 @@
 import { FlatList, StyleSheet, Text, View, Image, Pressable } from "react-native";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { ShopContext } from "./context/ShopContext";
-import { Burger } from "./context/BurgerContext";
 
 const CartScreen = () => {
-  const { itemsData, setCartData, cartData, loading } = useContext(ShopContext);
+  const { setCartData, cartData } = useContext(ShopContext);
    const [showMessage, setShowMessage] = useState(false);
 
-  const onBtnPress = (item) => {
+   const [countOfProducts, setCountOfProducts]=useState(0)
+   const [sum, setSum]=useState(0)
+
+   useEffect(() => {
+    let newSum = 0;
+
+  cartData.forEach((item) => {
+    newSum += item.price
+  });
+
+  setSum((prev) => newSum);
+  setCountOfProducts(cartData.length);
+}, [cartData]);
+
+  const onRemoveItem  = (index) => {
     setShowMessage(true);
     setTimeout(() => setShowMessage(false), 2000);
-    setCartData((prev) => prev.filter((cartItem) => cartItem.id !== item.id));
+    setCartData((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
       return (
         <View style={styles.itemContainer}>
                <Image
@@ -25,7 +38,7 @@ const CartScreen = () => {
                <Text style={styles.title}>{item.title}</Text>
                <View style={styles.flex}>
                  <Text style={styles.price}>{item.price}$</Text>
-                 <Pressable style={styles.btnContainer} onPress={()=>onBtnPress(item)}>
+                 <Pressable style={styles.btnContainer} onPress={() => onRemoveItem(index)}>
                    <Text style={styles.btnText}>Delete</Text>
                  </Pressable>
                </View>
@@ -35,12 +48,18 @@ const CartScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Burger />
-      <Text style={styles.mainText}>YOUR CART</Text>
+      <View style={styles.flexScores}>
+        <View style={styles.scoreContainer}>
+      <Text style={styles.scoreText}>Number of products: {countOfProducts}</Text>
+      </View>
+      <View style={styles.scoreContainer}>
+      <Text style={styles.scoreText}>Total price: {sum} $</Text>
+      </View>
+      </View>
       <FlatList
         data={cartData}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.title}-${item.price}-${index}`} 
       />
 
        {showMessage && (
@@ -70,6 +89,28 @@ const styles = StyleSheet.create({
   mainText: {
     fontSize: 20,
     fontWeight: 900,
+  },
+  flexScores:{
+    flexDirection:"row",
+    gap:20
+  },
+  scoreContainer:{
+    marginVertical:10,
+    height:50,
+    width:150,
+    borderWidth:1.3,
+    borderColor:"black",
+    borderRadius:10,
+    backgroundColor:"white"
+  },
+  scoreText:{
+    width:90,
+    fontSize:14,
+    marginTop:6,
+    marginLeft:25,
+    textAlign:"center",
+    fontWeight:500,
+    color:"#c72020"
   },
   itemContainer: {
     alignItems: "center",

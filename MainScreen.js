@@ -5,15 +5,15 @@ import {
   View,
   Image,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { useContext, useState } from "react";
 import { ShopContext } from "./context/ShopContext";
-import { BurgerProvider } from "./context/BurgerContext";
-import { Burger } from "./context/BurgerContext";
 
-const MainScreen = (item) => {
-  const { itemsData, setCartData, cartData, loading } = useContext(ShopContext);
+const MainScreen = ({navigation}) => {
+  const { itemsData, setCartData} = useContext(ShopContext);
   const [showMessage, setShowMessage] = useState(false);
+
 
   const onCartPress = (item) => {
     setShowMessage(true);
@@ -23,7 +23,9 @@ const MainScreen = (item) => {
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.itemContainer}>
+      <TouchableOpacity 
+      style={styles.itemContainer} 
+      onPress={() => navigation.navigate("ProductScreen", { product: item })}>
         <Image
           style={styles.picture}
           source={{
@@ -37,16 +39,15 @@ const MainScreen = (item) => {
             <Image style={styles.cart} source={require("./images/cart.png")} />
           </Pressable>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
   return (
     <View style={styles.container}>
-      <Burger />
       <FlatList
         data={itemsData}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
       />
 
       {showMessage && (
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
 
   message: {
     position: "absolute",
-    top: 80,
+    top: 20,
     backgroundColor: "white",
     padding: 10,
     height:50,
